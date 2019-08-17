@@ -13,6 +13,8 @@ let ratingSelected = null;
 function getMainContainer() {
   return document.getElementById("container");
 }
+
+//Load the schema defintion for the application
 function getSchema(callback) {
   fetch(questionsUrl)
     .then(response => response.json())
@@ -23,6 +25,7 @@ function getSchema(callback) {
     .catch((schema = []));
 }
 
+//Get options from the backend and execute render callback function
 function getOptions(
   qid,
   callback,
@@ -33,7 +36,6 @@ function getOptions(
   fetch(optUrl + qid)
     .then(response => response.json())
     .then(result => {
-      console.log("result");
       callback(result, title, container, mandatory);
     })
     .catch();
@@ -48,6 +50,7 @@ function renderSchema() {
 
   let totalFields = schema.length;
   for (let i = 0; i < totalFields; i++) {
+    //Call render for all the fields/row
     renderFields(schema[i]);
   }
   let submitElement = document.createElement("input");
@@ -57,13 +60,11 @@ function renderSchema() {
   mainContainer.appendChild(formElement);
 }
 
-//onsubmit="return validateForm()"
+//Validate the form on submit click
 function validateForm(e) {
   e.preventDefault();
   let rateValue = ratingSelected;
-  // let descValue = document.forms["surveyForm"]["description"].value;
   let satValue = document.forms["surveyForm"]["satisfaction"].value;
-  //console.log("all : " + rateValue, descValue, satValue);
   if (rateValue == "" || rateValue == null) {
     alert("Provide rating for the survey");
     return false;
@@ -76,13 +77,20 @@ function validateForm(e) {
     alert("Select at least one description for our product");
     return false;
   } else {
-    console.log("submit");
-    document.getElementById("surveyForm").submit();
+    //Hide the container and show success alert div
+    let containerDiv = document.getElementById("container");
+    setTimeout(function() {}, 500);
+    containerDiv.style.display = "none";
+    let sucessDiv = document.getElementById("success");
+    sucessDiv.classList.remove("success-hide");
+    sucessDiv.classList.add("success-alert");
+    return true;
   }
 }
 
 function isValidDescription() {
   var len = checkOptions.length;
+  //Loop through all the check boxes to check if at least one is checked
   for (let i = 0; i < len; i++) {
     if (document.getElementById("description" + i).checked) {
       return true;
@@ -92,7 +100,6 @@ function isValidDescription() {
 }
 
 function renderFields(field) {
-  // mainContainer = document.getElementById("container");
   let formElement = document.getElementById("surveyForm");
   let newElement;
   switch (field.type) {
@@ -110,6 +117,7 @@ function renderFields(field) {
 }
 
 function getInputElement(mainContainer, field) {
+  //Create and render the input element
   let spanElement = document.createElement("span");
   spanElement.setAttribute("class", "label");
   let labelNode = document.createTextNode(
@@ -201,15 +209,11 @@ function renderCheckOptions(options, title, container, mandatory) {
     var label = document.createElement("label");
     let checkLabel = getTextNodeElement(options[i].label);
     label.appendChild(checkLabel);
-    // checkElement.appendChild(checkLabel);
 
     checkContainerElement.appendChild(checkElement);
     checkContainerElement.appendChild(checkLabel);
-    // fieldsetElement.appendChild(checkElement);
-    // fieldsetElement.appendChild(checkLabel);
   }
   fieldsetElement.appendChild(checkContainerElement);
-  // container.appendChild(fieldsetElement);
   let checkDiv = document.getElementById("checkbox");
   checkDiv.appendChild(fieldsetElement);
 }
@@ -232,11 +236,6 @@ function renderRatings() {
   let rateDiv = document.getElementById("rating");
 
   for (let i = 0; i < ratingCount; i++) {
-    // let radioElement = document.createElement("input");
-    // radioElement.setAttribute("type", "radio");
-    // radioElement.setAttribute("name", "rate");
-    // radioElement.setAttribute("value", i + 1);
-
     let radioElement = document.createElement("div");
     radioElement.setAttribute("id", "radio-cell" + (i + 1));
     radioElement.innerHTML = i + 1;
@@ -246,13 +245,11 @@ function renderRatings() {
     let radioLabel = getTextNodeElement(i + 1);
     label.appendChild(radioLabel);
     rateDiv.appendChild(radioElement);
-    // rateDiv.appendChild(radioLabel);
-    // fieldsetElement.appendChild(radioElement);
-    // fieldsetElement.appendChild(radioLabel);
   }
 }
 
 function updateRating(ev) {
+  //Executes on click of any rating box and update the selection
   if (ratingSelected) {
     document
       .getElementById("radio-cell" + ratingSelected)
@@ -275,7 +272,9 @@ function getTextNodeElement(label) {
 }
 
 function startApp() {
+  //Get the schema from backend and render it. Send render function as callback
   getSchema(renderSchema);
 }
 
+//Start the application
 startApp();
